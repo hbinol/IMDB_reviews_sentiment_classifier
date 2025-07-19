@@ -297,5 +297,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-MLOps Zoomcamp Final Project
-Project Link: [https://github.com/yourusername/IMDB_reviews_sentiment_classifier](https://github.com/yourusername/IMDB_reviews_sentiment_classifier) 
+**Author**: hbinol  
+**GitHub**: [@hbinol](https://github.com/hbinol)  
+**Project Repository**: [IMDB_reviews_sentiment_classifier](https://github.com/hbinol/IMDB_reviews_sentiment_classifier)
+
+MLOps Zoomcamp Final Project 
