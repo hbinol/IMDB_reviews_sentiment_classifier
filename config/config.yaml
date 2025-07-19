@@ -1,0 +1,102 @@
+# IMDB Sentiment Classification Configuration
+
+# Project metadata
+project:
+  name: "imdb-sentiment-classifier"
+  version: "1.0.0"
+  description: "MLOps project for IMDB movie reviews sentiment classification"
+
+# Data configuration
+data:
+  dataset_name: "imdb"
+  dataset_size: 50000  # Number of samples to use (null for full dataset)
+  test_size: 0.2
+  val_size: 0.1
+  random_state: 42
+  
+  # Preprocessing
+  text_column: "review"
+  label_column: "sentiment"
+  max_length: 500  # Maximum sequence length
+  min_word_freq: 2  # Minimum word frequency for vocabulary
+
+# Feature engineering
+features:
+  max_features: 10000
+  ngram_range: [1, 2]
+  use_tfidf: true
+  tfidf_params:
+    max_df: 0.95
+    min_df: 2
+    stop_words: "english"
+    
+# Model configuration
+models:
+  random_state: 42
+  cv_folds: 5
+  scoring_metric: "f1"
+  
+  # Model parameters
+  logistic_regression:
+    C: [0.1, 1, 10]
+    max_iter: [1000]
+    solver: ["liblinear"]
+    
+  svm:
+    C: [0.1, 1, 10]
+    kernel: ["linear", "rbf"]
+    gamma: ["scale", "auto"]
+    
+  random_forest:
+    n_estimators: [100, 200]
+    max_depth: [10, 20, null]
+    min_samples_split: [2, 5]
+    min_samples_leaf: [1, 2]
+
+# MLflow configuration
+mlflow:
+  tracking_uri: "./mlruns"
+  experiment_name: "imdb-sentiment-classification"
+  artifact_location: "./mlartifacts"
+  
+# Prefect configuration
+prefect:
+  work_pool: "default-agent-pool"
+  
+# Deployment configuration
+deployment:
+  batch_size: 1000
+  output_format: "csv"
+  model_name: "imdb_sentiment_classifier"
+  model_stage: "Production"
+  
+# Monitoring configuration
+monitoring:
+  reference_window_size: 1000
+  current_window_size: 500
+  drift_threshold: 0.1
+  
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false
+  
+# Logging configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+  
+# LocalStack configuration
+localstack:
+  endpoint_url: "http://localhost:4566"
+  region: "us-east-1"
+  s3_bucket: "imdb-ml-models"
+  
+# Paths
+paths:
+  data_dir: "data"
+  models_dir: "models"
+  logs_dir: "logs"
+  config_dir: "config" 

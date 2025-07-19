@@ -1,0 +1,115 @@
+version: '3.8'
+
+services:
+  # LocalStack for AWS services simulation
+  localstack:
+    container_name: imdb-localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
+    environment:
+      - DEBUG=1
+      - SERVICES=s3,iam,lambda,cloudformation
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_EXECUTOR=docker
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - "./tmp/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - imdb-network
+
+  # MLflow tracking server
+  mlflow:
+    container_name: imdb-mlflow
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mlflow
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_BACKEND_STORE_URI=sqlite:///mlflow/mlflow.db
+      - MLFLOW_DEFAULT_ARTIFACT_ROOT=/mlflow/artifacts
+    volumes:
+      - "./mlruns:/mlflow"
+    command: >
+      sh -c "mlflow server 
+             --backend-store-uri sqlite:///mlflow/mlflow.db 
+             --default-artifact-root /mlflow/artifacts 
+             --host 0.0.0.0 
+             --port 5000"
+    networks:
+      - imdb-network
+
+  # Prefect server
+  prefect-server:
+    container_name: imdb-prefect-server
+    image: prefecthq/prefect:2.13.0-python3.9
+    ports:
+      - "4200:4200"
+    environment:
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=sqlite+aiosqlite:////opt/prefect/database.db
+    volumes:
+      - "./tmp/prefect:/opt/prefect"
+    command: prefect server start --host 0.0.0.0
+    networks:
+      - imdb-network
+
+  # Main application
+  imdb-app:
+    container_name: imdb-sentiment-app
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - PREFECT_API_URL=http://prefect-server:4200/api
+      - AWS_ENDPOINT_URL=http://localstack:4566
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - "./data:/app/data"
+      - "./models:/app/models"
+      - "./logs:/app/logs"
+    depends_on:
+      - localstack
+      - mlflow
+      - prefect-server
+    networks:
+      - imdb-network
+
+  # Jupyter notebook for development
+  jupyter:
+    container_name: imdb-jupyter
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    volumes:
+      - "./notebooks:/home/jovyan/work/notebooks"
+      - "./data:/home/jovyan/work/data"
+      - "./src:/home/jovyan/work/src"
+      - "./config:/home/jovyan/work/config"
+    networks:
+      - imdb-network
+
+networks:
+  imdb-network:
+    driver: bridge
+
+volumes:
+  localstack_data:
+  mlflow_data:
+  prefect_data: 
