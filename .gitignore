@@ -89,6 +89,13 @@ mlartifacts/
 # Documentation builds
 docs/_build/
 
+# Tutorial documentation files (keep only Overview.md for course evaluation)
+docs/README.md
+docs/Quick_Start_Guide.md
+docs/01_MLOps_Fundamentals.md
+docs/03_Data_Pipeline.md
+docs/MLOps_Concepts_Guide.md
+
 # Temporary files
 *.tmp
 *.temp 
