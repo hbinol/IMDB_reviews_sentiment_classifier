@@ -312,10 +312,9 @@ except FileNotFoundError:
 
 For deep dives into each concept:
 - [01_MLOps_Fundamentals.md](01_MLOps_Fundamentals.md) - Core principles
-- [03_Data_Pipeline.md](03_Data_Pipeline.md) - Data handling
-- [06_Experiment_Tracking.md](06_Experiment_Tracking.md) - MLflow
-- [07_Model_Deployment.md](07_Model_Deployment.md) - Production serving
-- [10_Monitoring.md](10_Monitoring.md) - Model monitoring
+- [03_Data_Pipeline.md](03_Data_Pipeline.md) - Data handling  
+- [MLOps_Concepts_Guide.md](MLOps_Concepts_Guide.md) - Complete implementation guide
+- [Overview.md](Overview.md) - High-level project overview
 
 ## 💡 Key Takeaways
 
